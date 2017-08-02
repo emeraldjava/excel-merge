@@ -20,13 +20,28 @@ class Worksheet extends MergeTask {
 		if (!file_exists($filename)) {
 			return array(false, false);
 		}
-		$new_sheet_number = $this->getSheetCount($this->result_dir) + 1;
+		error_log('merge worksheet '.$filename);
+		$name = $this->extractWorksheetName($filename);
+
+		if($name=='Members')
+			$this->set(1,$name);
+		else if($name=='Inactive')
+			$this->set(2,$name);
+		else if($name=='Day')
+			$this->set(3,$name);
+		else if($name=='Pre-Registered')
+			$this->set(4,$name);
+
+		$new_sheet_number = $this->sheet_number;
+		//$new_sheet_number = $this->getSheetCount($this->result_dir) + 1;
 
 		// copy file into place
 		$new_name = $this->result_dir . "/xl/worksheets/sheet{$new_sheet_number}.xml";
+		error_log('$new_name '.$new_name);
 		if (!is_dir(dirname($new_name))) {
 			mkdir(dirname($new_name));
 		}
+		error_log('$filename '.$filename);
 		copy($filename, $new_name);
 
 		// adjust references to any shared strings
@@ -39,10 +54,12 @@ class Worksheet extends MergeTask {
 
 		// save worksheet with adjustments
 		$sheet->save($new_name);
+		$sheet->save($filename);
 
 		// extract worksheet name
 		$sheet_name = $this->extractWorksheetName($filename);
 
+		//return array($this->sheet_number, $sheet_name);
 		return array($new_sheet_number, $sheet_name);
 	}
 
@@ -117,11 +134,14 @@ class Worksheet extends MergeTask {
 		sscanf(basename($filename), "sheet%d.xml", $number);
 
 		$sheet_name = "Worksheet $number";
+		error_log('extractWorksheetName() '.$sheet_name.' / '.$number);
 		$elems = $xpath->query("//m:sheets/m:sheet[@sheetId='" . $number . "']");
 //		$elems = $xpath->query("//m:sheets/m:sheet[@sheetId='" . $sheet_number . "']");
 		foreach ($elems as $e) {
 			// should be one only
 			$sheet_name = $e->getAttribute('name');
+			$sheet_id = $e->getAttribute('sheetId');
+			error_log('extractWorksheetName() '.$sheet_name.' '.$sheet_id);
 			break;
 		}
 

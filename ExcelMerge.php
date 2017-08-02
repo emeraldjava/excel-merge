@@ -80,6 +80,7 @@ class ExcelMerge {
 
 		// move the zipped file to the provided destination
 		rename($zipfile, $where);
+		error_log('save() '.$where);
 
 		// returns the name of the file
 		return $where;
@@ -131,14 +132,20 @@ class ExcelMerge {
 				$this->unzip($filename, $zip_dir);
 
 				$shared_strings = $this->tasks->sharedStrings->merge($zip_dir);
-				list($styles, $conditional_styles) = $this->tasks->styles->merge($zip_dir);
-				$this->tasks->vba->merge($zip_dir);
+				error_log('merged shared strings');
+				//list($styles, $conditional_styles) = $this->tasks->styles->merge($zip_dir);
+				//$this->tasks->vba->merge($zip_dir);
 
 				$worksheets = glob("{$zip_dir}/xl/worksheets/sheet*.xml");
+
 				foreach ($worksheets as $s) {
-					list($sheet_number, $sheet_name) = $this->tasks->worksheet->merge($s, $shared_strings, $styles, $conditional_styles);
+					error_log('merging $worksheet '.$s);
+					list($sheet_number, $sheet_name) = $this->tasks->worksheet->merge($s, $shared_strings, array(), array());
+					// $styles, $conditional_styles);
 
 					if ($sheet_number!==false) {
+						//error_log('merging workbook : '.$sheet_name.' / '.$sheet_number);
+
 						$this->tasks->workbookRels->set($sheet_number, $sheet_name)->merge();
 						$this->tasks->contentTypes->set($sheet_number, $sheet_name)->merge();
 						$this->tasks->app->set($sheet_number, $sheet_name)->merge();
@@ -180,11 +187,11 @@ class ExcelMerge {
 		return count(array_diff(scandir($this->result_dir), array('.', '..'))) == 0;
 	}
 
-
 	protected function unzip($filename, $directory) {
 		$zip = new \ZipArchive();
 		$zip->open($filename);
 		$zip->extractTo($directory);
+		error_log('unzip() '.$filename.' / '.$directory);
 		$zip->close();
 	}
 

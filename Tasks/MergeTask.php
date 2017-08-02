@@ -47,7 +47,7 @@ abstract class MergeTask {
 	public function set($sheet_number, $sheet_name) {
 		$this->sheet_number = $sheet_number;
 		$this->sheet_name = $sheet_name;
-
+		error_log($this->sheet_name.'/'.$this->sheet_number);
 		return $this; // so we can chain methods, as in $this->set()->merge()
 	}
 }
