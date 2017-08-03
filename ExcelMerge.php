@@ -145,7 +145,6 @@ class ExcelMerge {
 
 					if ($sheet_number!==false) {
 						//error_log('merging workbook : '.$sheet_name.' / '.$sheet_number);
-
 						$this->tasks->workbookRels->set($sheet_number, $sheet_name)->merge();
 						$this->tasks->contentTypes->set($sheet_number, $sheet_name)->merge();
 						$this->tasks->app->set($sheet_number, $sheet_name)->merge();

@@ -23,16 +23,25 @@ class Worksheet extends MergeTask {
 		error_log('merge worksheet '.$filename);
 		$name = $this->extractWorksheetName($filename);
 
-		if($name=='Members')
+		$new_sheet_number = 0;
+		if($name=='Members') {
 			$this->set(1,$name);
-		else if($name=='Inactive')
+			$new_sheet_number = 1; }
+		else if($name=='Inactive'){
 			$this->set(2,$name);
-		else if($name=='Day')
+			$new_sheet_number = 2;}
+		else if($name=='Day'){
 			$this->set(3,$name);
-		else if($name=='Pre-Registered')
+			$new_sheet_number = 3;}
+		else if($name=='Pre-Registered'){
 			$this->set(4,$name);
+			$new_sheet_number = 4;}
+		else {
+			$new_sheet_number = $this->getSheetCount($this->result_dir) + 1;
+			$this->set($new_sheet_number,$name);
+		}
 
-		$new_sheet_number = $this->sheet_number;
+		//$new_sheet_number = $this->sheet_number;
 		//$new_sheet_number = $this->getSheetCount($this->result_dir) + 1;
 
 		// copy file into place
@@ -54,7 +63,7 @@ class Worksheet extends MergeTask {
 
 		// save worksheet with adjustments
 		$sheet->save($new_name);
-		$sheet->save($filename);
+		//$sheet->save($filename);
 
 		// extract worksheet name
 		$sheet_name = $this->extractWorksheetName($filename);
